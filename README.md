@@ -12,6 +12,9 @@ your battery's performance and degradation patterns.
 - **Data Persistence**: Stores collected data in a CSV file for long-term tracking.
 - **Visual Analytics**: Generates time-series plots to visualize battery health trends.
 - **Effortless Monitoring**: Eliminates the need for manual checks through system reports.
+- **Organized Data Storage**: 
+  - CSV data is stored in the `data` directory.
+  - Generated plots are saved as PNG files in the `graphs` directory.
 
 ## Example Output
 
@@ -40,6 +43,10 @@ Run the script manually:
 ```
 ./battery_tracker.sh
 ```
+
+After running the script, you can find:
+- The CSV file with battery data in the `data` directory.
+- The generated plots in the `graphs` directory.
 
 ## Automation
 
@@ -91,6 +98,54 @@ If you encounter issues with cron job execution, check the system logs:
 ```
 grep CRON /var/log/syslog
 ```
+
+## Technical Details
+
+### Program Structure
+
+The MacOS Battery Tracker consists of several key components:
+
+1. **battery_tracker.sh**: This shell script serves as the entry point for the application. It sets up a Python virtual
+   environment, installs dependencies, and runs the main Python script.
+
+2. **battery_tracker.py**: This is the core Python script that performs the following tasks:
+    - Retrieves battery data using system commands
+    - Updates the CSV file with new data
+    - Generates plots for visualization
+
+3. **automate.sh**: This script automates the process of setting up a cron job for regular execution of the battery
+   tracker.
+
+### Data Collection
+
+The program uses the `system_profiler` command-line tool to retrieve battery information:
+
+```python
+cmd = ["/usr/sbin/system_profiler", "SPPowerDataType"]
+result = subprocess.run(cmd, capture_output=True, text=True)
+```
+
+It then parses the output to extract the cycle count and maximum capacity.
+
+### Data Storage
+
+Battery data is stored in a CSV file (`data/battery_health_tracker.csv`) with the following structure:
+
+```
+Date,Cycle Count,Maximum Capacity (%)
+```
+
+The script checks if the cycle count has changed before adding a new entry, ensuring that data is only recorded when
+there's a meaningful change.
+
+### Visualization
+
+The program uses matplotlib to create two types of plots:
+
+1. Battery Capacity Over Time
+2. Battery Cycle Count Over Time
+
+These plots are saved as PNG files in the `graphs` directory.
 
 ## Contributing
 
